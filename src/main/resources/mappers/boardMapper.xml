@@ -3,8 +3,7 @@
 	
 <mapper namespace="boardMapper">
 
-	<insert id="insertBoard" parameterType="BoardDTO">
-		
+	<insert id="insertBoard" parameterType="BoardDTO">		
 		INSERT INTO BOARD (
 			PASSWD,
 			WRITER,
@@ -16,8 +15,24 @@
 			#{writer},
 			#{subject},
 			#{content}
-		)
-		
+		)		
 	</insert>
+	
+	<select id="selectListBoard" resultType="BoardDTO">
+		SELECT
+				*
+		FROM
+				BOARD
+	</select>
+	
+	
+	<select id="selectOneBoard" parameterType="long" resultType="BoardDTO">
+		SELECT
+				*
+		FROM
+				BOARD
+		WHERE
+				BOARD_ID = #{boardId}
+	</select>
 
 </mapper>
