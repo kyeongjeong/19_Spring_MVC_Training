@@ -28,7 +28,7 @@ public class BoardController {
 	
 	@PostMapping("/addBoard")
 	@ResponseBody
-	public String addBoard(@ModelAttribute BoardDTO boardDTO) {
+	public String addBoard(@ModelAttribute BoardDTO boardDTO) throws Exception {
 		
 		//단위 테스트
 		//System.out.println(boardDTO);
@@ -44,7 +44,7 @@ public class BoardController {
 	}
 	
 	@GetMapping("/boardList")
-	public ModelAndView boardList() {
+	public ModelAndView boardList() throws Exception {
 		
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("board/boardList");
@@ -59,7 +59,7 @@ public class BoardController {
 	
 	
 	@GetMapping("/boardDetail")
-	public ModelAndView boardDetail(@RequestParam("boardId") long boardId) {
+	public ModelAndView boardDetail(@RequestParam("boardId") long boardId) throws Exception {
 		
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("board/boardDetail");
@@ -70,12 +70,89 @@ public class BoardController {
 	
 	@GetMapping("/authentication")
 	public ModelAndView authentication(@RequestParam("boardId") long boardId,
-										@RequestParam("menu") String menu) {		
+									   @RequestParam("menu") String menu) throws Exception {	
+		
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("board/authentication");
 		mv.addObject("boardDTO", boardService.getBoardDetail(boardId));
 		mv.addObject("menu", menu);
 		
 		return mv;	
+	}
+	
+	@PostMapping("/authentication")
+	@ResponseBody
+	public String authentication(@ModelAttribute BoardDTO boardDTO,
+								 @RequestParam("menu") String menu) throws Exception {
+		
+		String jsScript = "";
+		if (boardService.checkAuthorizedUser(boardDTO)) {
+			if (menu.equals("update")) {
+			   jsScript = "<script>";
+			   jsScript += "location.href='modifyBoard?boardId=" + boardDTO.getBoardId() + "';";
+			   jsScript += "</script>";
+			}
+			else if (menu.equals("delete")) {
+			   jsScript = "<script>";
+			   jsScript += "location.href='removeBoard?boardId=" + boardDTO.getBoardId() + "';";
+			   jsScript += "</script>";
+			}
+			
+		}
+		else {
+			   jsScript = "<script>";
+			   jsScript += "alert('Check your Id or Password');";
+			   jsScript += "history.go(-1);";
+			   jsScript += "</script>";
+		}
+		
+		return jsScript;		
+	}
+	
+	@GetMapping("/modifyBoard")
+	public ModelAndView modifyBoard(@RequestParam("boardId") long boardId) throws Exception {
+		
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("board/modifyBoard");
+		mv.addObject("boardDTO", boardService.getBoardDetail(boardId));
+		
+		return mv;
+	}
+	
+	@PostMapping("/modifyBoard")
+	@ResponseBody
+	public String modifyBoard(@ModelAttribute BoardDTO boardDTO) throws Exception {
+		
+		boardService.modifyBoard(boardDTO);
+		
+		String jsScript = "<script>";
+		jsScript += "alert('It's Changed');";
+		jsScript += "location.href='addBoard';";
+		jsScript += "</script>";
+		return jsScript;
+	}
+	
+	@GetMapping("/removeBoard")
+	public ModelAndView removeBoard(@RequestParam("boardId") long boardId) throws Exception {
+		
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("board/removeBoard");
+		mv.addObject("boardId", boardId);
+		
+		return mv;	
+	}
+		
+	@PostMapping("/removeBoard")
+	@ResponseBody
+	public String postRemoveBoard(@RequestParam("boardId") long boardId) throws Exception {
+		
+		boardService.removeBoard(boardId);
+		
+		String jsScript = "<script>";
+			   jsScript += "alert('It has been deleted.');";
+			   jsScript += "location.href='boardList';";
+			   jsScript += "</script>";
+	
+		return jsScript;	
 	}
 }

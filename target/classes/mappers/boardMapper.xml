@@ -34,5 +34,41 @@
 		WHERE
 				BOARD_ID = #{boardId}
 	</select>
+	
+	<select id="selectOnePasswd" parameterType="long" resultType="String">
+		SELECT
+				PASSWD
+		FROM	
+				BOARD
+		WHERE
+				BOARD_ID = #{boardId}
+	</select>
+	
+	<update id="updateReadCnt" parameterType="long">
+		UPDATE
+				BOARD
+		SET
+				READ_CNT = READ_CNT + 1
+		WHERE
+				BOARD_ID = #{boardId}
+	</update>
+	
+	<update id="updateBoard" parameterType="BoardDTO">
+		UPDATE
+				BOARD
+		SET
+				SUBJECT = #{subject},
+				CONTENT = #{content},
+				MODIFY_DT = NOW()
+		WHERE
+				BOARD_ID = #{boardId}
+	</update>
+	
+	<update id="deleteBoard" parameterType="long">
+		DELETE FROM
+				BOARD
+		WHERE
+				BOARD_ID = #{boardId}
+	</update>
 
 </mapper>

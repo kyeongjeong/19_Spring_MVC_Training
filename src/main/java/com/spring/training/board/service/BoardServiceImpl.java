@@ -3,8 +3,10 @@ package com.spring.training.board.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.training.board.dao.BoardDAO;
 import com.spring.training.board.dto.BoardDTO;
@@ -55,7 +57,7 @@ public class BoardServiceImpl implements BoardService {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Override
-	public void addBoard(BoardDTO boardDTO) {
+	public void addBoard(BoardDTO boardDTO) throws Exception {
 
 		//System.out.println("Service : " + boardDTO);
 		
@@ -66,7 +68,7 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public List<BoardDTO> getBoardList() {
+	public List<BoardDTO> getBoardList() throws Exception {
 		
 		//List<BoardDTO> boardList = boardDAO.selectListBoard();
 		//return boardList;
@@ -76,7 +78,37 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	@Override
-	public BoardDTO getBoardDetail(long boardId) {
+	@Transactional
+	@Scheduled(cron="초 분 시 일 월 요일 (년)")
+	public BoardDTO getBoardDetail(long boardId) throws Exception {
+		
+		boardDAO.updateReadCnt(boardId);
 		return boardDAO.selectOneBoard(boardId);
+	}
+
+	@Override
+	public boolean checkAuthorizedUser(BoardDTO boardDTO) throws Exception {
+
+		String rawPassword = boardDTO.getPasswd();
+		String encodedPassword = boardDAO.selectOnePasswd(boardDTO.getBoardId());
+		
+		boolean isAuthorizedUser = false;
+		if (bCryptPasswordEncoder.matches(rawPassword, encodedPassword)) {
+			isAuthorizedUser = true;
+		}
+		
+		return isAuthorizedUser;
+	}
+
+	@Override
+	public void modifyBoard(BoardDTO boardDTO) throws Exception {
+
+		boardDAO.updateBoard(boardDTO);
+	}
+  
+	@Override
+	public void removeBoard(long boardId) throws Exception {
+
+		boardDAO.deleteBoard(boardId);
 	}
 }

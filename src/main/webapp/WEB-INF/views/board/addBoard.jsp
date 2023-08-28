@@ -2,8 +2,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>add board</title>
+	<meta charset="UTF-8">
+	<title>add board</title>
+	<script src="resources/ckeditor/ckeditor.js"></script>
 </head>
 <body>
 
@@ -27,6 +28,7 @@
 					<td>글내용</td>
 					<td>
 						<textarea rows="10" cols="50" name="content" ></textarea>
+						<script>CKEDITOR.replace("content");</script>
 					</td>
 				</tr>
 				<tr >
